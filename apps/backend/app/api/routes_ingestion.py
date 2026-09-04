@@ -1,0 +1,17 @@
+from fastapi import APIRouter
+
+from app.ingestion.schemas import RawDevicePayload
+from app.services.pipeline import IngestionPipeline
+
+router = APIRouter(prefix="/ingestion", tags=["ingestion"])
+pipeline = IngestionPipeline()
+
+
+@router.post("/events")
+def ingest_event(payload: RawDevicePayload):
+    result = pipeline.run(payload)
+    return {
+        "observation": result["observation"].model_dump(mode="json"),
+        "alert": result["alert"].model_dump(mode="json") if result["alert"] else None,
+        "task": result["task"].model_dump(mode="json") if result["task"] else None,
+    }

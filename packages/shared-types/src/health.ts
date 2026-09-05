@@ -31,3 +31,41 @@ export interface CareTask {
   title: string
   status: 'todo' | 'done'
 }
+
+export type UserRole = 'admin' | 'caregiver' | 'clinician' | 'family'
+export type NotificationChannel = 'sms' | 'phone_call' | 'wechat' | 'email'
+
+export interface RuleSetVersion {
+  version: string
+  description: string
+  createdAt: string
+  enabled: boolean
+}
+
+export interface DataQualityReport {
+  totalEvents: number
+  missingValueEvents: number
+  duplicateEvents: number
+  abnormalValueEvents: number
+  qualityScore: number
+}
+
+export interface TrendInsight {
+  personId: string
+  metric: string
+  period: 'daily' | 'weekly' | 'monthly'
+  minValue: number
+  maxValue: number
+  avgValue: number
+  sampleCount: number
+}
+
+export interface NotificationMessage {
+  messageId: string
+  personId: string
+  recipientRole: UserRole
+  channel: NotificationChannel
+  title: string
+  body: string
+  sentAt: string
+}

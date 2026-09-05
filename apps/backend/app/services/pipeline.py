@@ -1,8 +1,8 @@
-from app.adapters.blood_pressure_monitor import BloodPressureAdapter
 from app.care_loop.engine import Alert, CareTask, ClosedLoopEngine
 from app.ingestion.schemas import RawDevicePayload
 from app.models.unified import UnifiedObservation
 from app.rules.engine import RuleEngine
+from app.services.adapter_registry import AdapterRegistry
 
 
 class PipelineResult(dict):
@@ -15,12 +15,13 @@ class IngestionPipeline:
     """Data Ingestion -> Standardization -> Rule Engine -> Alert -> Task"""
 
     def __init__(self) -> None:
-        self.adapter = BloodPressureAdapter()
+        self.adapter_registry = AdapterRegistry()
         self.rule_engine = RuleEngine()
         self.closed_loop = ClosedLoopEngine()
 
     def run(self, payload: RawDevicePayload) -> PipelineResult:
-        observation = self.adapter.transform(payload)
+        adapter = self.adapter_registry.get(payload.source_type)
+        observation = adapter.transform(payload)
         rule_result = self.rule_engine.evaluate(observation)
 
         if not rule_result.triggered:

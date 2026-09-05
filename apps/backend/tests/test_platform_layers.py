@@ -1,8 +1,11 @@
 from datetime import datetime, timezone
 
-from fastapi.testclient import TestClient
-
-from app.main import app
+from app.api.routes_admin import admin_dashboard
+from app.api.routes_caregiver import get_todays_tasks
+from app.api.routes_clinician import trend
+from app.api.routes_family import family_report
+from app.api.routes_ingestion import ingest_event
+from app.ingestion.schemas import RawDevicePayload
 from app.models.platform import NotificationChannel, UserRole
 from app.models.unified import DomainType, SourceType, UnifiedObservation
 from app.services.data_quality import DataQualityService
@@ -99,32 +102,26 @@ def test_rbac_and_notification_services_work():
 
 
 def test_role_based_routes_return_expected_payloads():
-    client = TestClient(app)
-
-    response = client.post(
-        "/ingestion/events",
-        json={
-            "message_id": "evt-role-1",
-            "person_id": "person-route-1",
-            "source_type": "iot",
-            "source_device_id": "dev-route",
-            "metric": "systolic_bp",
-            "value": 170,
-            "unit": "mmHg",
-            "occurred_at": datetime.now(timezone.utc).isoformat(),
-            "domain": "vital",
-        },
+    ingest_event(
+        RawDevicePayload(
+            message_id="evt-role-1",
+            person_id="person-route-1",
+            source_type=SourceType.IOT,
+            source_device_id="dev-route",
+            metric="systolic_bp",
+            value=170,
+            unit="mmHg",
+            occurred_at=datetime.now(timezone.utc),
+            domain=DomainType.VITAL,
+        )
     )
-    assert response.status_code == 200
 
-    admin = client.get("/admin/dashboard")
-    caregiver = client.get("/caregiver/tasks/today")
-    clinician = client.get("/clinician/trend/person-route-1/systolic_bp")
-    family = client.get("/family/reports/person-route-1")
+    admin = admin_dashboard()
+    caregiver = get_todays_tasks()
+    clinician = trend("person-route-1", "systolic_bp")
+    family = family_report("person-route-1")
 
-    assert admin.status_code == 200
-    assert caregiver.status_code == 200
-    assert clinician.status_code == 200
-    assert family.status_code == 200
-    assert admin.json()["overview"]["total_observations"] >= 1
-    assert clinician.json()["sample_count"] >= 1
+    assert admin["overview"]["total_observations"] >= 1
+    assert caregiver["tasks"][0]["status"] == "todo"
+    assert clinician["sample_count"] >= 1
+    assert family["person_id"] == "person-route-1"

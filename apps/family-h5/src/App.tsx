@@ -10,25 +10,24 @@ const cardStyle: CSSProperties = {
 export default function App() {
   return (
     <main style={{ fontFamily: 'Inter, system-ui, sans-serif', margin: '0 auto', maxWidth: 480, padding: 16, background: '#f6f8fa', color: '#1f2328' }}>
-      <h1>CareBridge Caregiver H5</h1>
-      <p>Mobile execution workspace for daily tasks, feedback, and handovers.</p>
-
+      <h1>CareBridge Family H5</h1>
+      <p>Family-facing updates, alert communication, and care feedback.</p>
       <section style={{ display: 'grid', gap: 10 }}>
         <article style={cardStyle}>
-          <h2>Today&apos;s Tasks</h2>
-          <p>Priority task queue with step-by-step instructions.</p>
+          <h2>Health Reports</h2>
+          <p>Weekly summaries and trend highlights in plain language.</p>
         </article>
         <article style={cardStyle}>
-          <h2>Care Instructions</h2>
-          <p>Actionable recommendations generated from alerts, rules, and clinician input.</p>
+          <h2>Alert Notices</h2>
+          <p>Abnormal-event notifications and progress follow-up.</p>
         </article>
         <article style={cardStyle}>
-          <h2>Execution Feedback</h2>
-          <p>Record execution outcomes, exceptions, and completion evidence.</p>
+          <h2>Service Records</h2>
+          <p>Execution timeline and confirmation updates.</p>
         </article>
         <article style={cardStyle}>
-          <h2>Shift Handover</h2>
-          <p>Summaries of key events, unresolved risks, and follow-up actions.</p>
+          <h2>Feedback</h2>
+          <p>Submit concerns and receive response status.</p>
         </article>
       </section>
     </main>
